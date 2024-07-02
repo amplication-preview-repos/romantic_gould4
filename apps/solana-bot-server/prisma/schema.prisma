@@ -1,0 +1,85 @@
+datasource db {
+  provider = "mongodb"
+  url      = env("DB_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Transaction {
+  amount    Float?
+  createdAt DateTime                  @default(now())
+  id        String                    @id @default(auto()) @map("_id") @db.ObjectId
+  status    EnumTransactionStatus?
+  typeField EnumTransactionTypeField?
+  updatedAt DateTime                  @updatedAt
+  wallet    Wallet?                   @relation(fields: [walletId], references: [id])
+  walletId  String?                   @db.ObjectId
+}
+
+model Wallet {
+  address      String?
+  buys         Buy[]
+  createdAt    DateTime      @default(now())
+  id           String        @id @default(auto()) @map("_id") @db.ObjectId
+  privateKey   String?
+  sells        Sell[]
+  transactions Transaction[]
+  updatedAt    DateTime      @updatedAt
+}
+
+model Buy {
+  amount    Float?
+  createdAt DateTime @default(now())
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  price     Float?
+  token     Token?   @relation(fields: [tokenId], references: [id])
+  tokenId   String?  @db.ObjectId
+  updatedAt DateTime @updatedAt
+  wallet    Wallet?  @relation(fields: [walletId], references: [id])
+  walletId  String?  @db.ObjectId
+}
+
+model Notification {
+  createdAt DateTime @default(now())
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  message   String?
+  read      Boolean?
+  token     Token?   @relation(fields: [tokenId], references: [id])
+  tokenId   String?  @db.ObjectId
+  updatedAt DateTime @updatedAt
+}
+
+model Token {
+  address       String?
+  buys          Buy[]
+  createdAt     DateTime       @default(now())
+  id            String         @id @default(auto()) @map("_id") @db.ObjectId
+  name          String?
+  notifications Notification[]
+  price         Float?
+  sells         Sell[]
+  symbolField   String?
+  updatedAt     DateTime       @updatedAt
+}
+
+model Sell {
+  amount    Float?
+  createdAt DateTime @default(now())
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  price     Float?
+  token     Token?   @relation(fields: [tokenId], references: [id])
+  tokenId   String?  @db.ObjectId
+  updatedAt DateTime @updatedAt
+  wallet    Wallet?  @relation(fields: [walletId], references: [id])
+  walletId  String?  @db.ObjectId
+}
+
+enum EnumTransactionStatus {
+  Option1
+}
+
+enum EnumTransactionTypeField {
+  Option1
+}
